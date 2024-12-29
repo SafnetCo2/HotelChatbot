@@ -15,32 +15,25 @@ namespace HotelChatbot
                 throw new ArgumentNullException("DefaultConnection", "Connection string cannot be null.");
         }
 
-        // Method to fetch all users from the database
+        // Fetch all users from the database
         public List<User> GetUsers()
         {
-            List<User> users = new List<User>();
+            var users = new List<User>();
 
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
-                string query = "SELECT * FROM Users";
+                const string query = "SELECT * FROM Users";
 
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                using (var cmd = new MySqlCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            // Null checks for Name and Email
-                            string name = reader["Name"]?.ToString() ?? throw new ArgumentNullException("Name cannot be null.");
-                            string email = reader["Email"]?.ToString() ?? throw new ArgumentNullException("Email cannot be null.");
+                        string name = reader["Name"]?.ToString() ?? throw new ArgumentNullException("Name cannot be null.");
+                        string email = reader["Email"]?.ToString() ?? throw new ArgumentNullException("Email cannot be null.");
 
-                            users.Add(new User(
-                                (int)reader["UserId"],
-                                name,
-                                email
-                            ));
-                        }
+                        users.Add(new User((int)reader["UserId"], name, email));
                     }
                 }
             }
@@ -48,32 +41,29 @@ namespace HotelChatbot
             return users;
         }
 
-        // Method to fetch all rooms from the database
+        // Fetch all rooms from the database
         public List<Room> GetRooms()
         {
-            List<Room> rooms = new List<Room>();
+            var rooms = new List<Room>();
 
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
-                string query = "SELECT * FROM Rooms";
+                const string query = "SELECT * FROM Rooms";
 
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                using (var cmd = new MySqlCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            // Null check for RoomType
-                            string roomType = reader["RoomType"]?.ToString() ?? throw new ArgumentNullException("RoomType cannot be null.");
+                        string roomType = reader["RoomType"]?.ToString() ?? throw new ArgumentNullException("RoomType cannot be null.");
 
-                            rooms.Add(new Room(
-                                (int)reader["RoomId"],
-                                roomType,
-                                (decimal)reader["Price"],
-                                (bool)reader["IsAvailable"]
-                            ));
-                        }
+                        rooms.Add(new Room(
+                            (int)reader["RoomId"],
+                            roomType,
+                            (decimal)reader["Price"],
+                            (bool)reader["IsAvailable"]
+                        ));
                     }
                 }
             }
@@ -81,15 +71,15 @@ namespace HotelChatbot
             return rooms;
         }
 
-        // Method to create a booking in the database
+        // Create a booking in the database
         public void CreateBooking(Booking booking)
         {
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
-                string query = "INSERT INTO Bookings (UserId, RoomId, BookingDate) VALUES (@UserId, @RoomId, @BookingDate)";
+                const string query = "INSERT INTO Bookings (UserId, RoomId, BookingDate) VALUES (@UserId, @RoomId, @BookingDate)";
 
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                using (var cmd = new MySqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@UserId", booking.UserId);
                     cmd.Parameters.AddWithValue("@RoomId", booking.RoomId);
@@ -99,32 +89,57 @@ namespace HotelChatbot
             }
         }
 
-        // Method to fetch all chat messages from the database
+        // Fetch all chat messages from the database, including User and optional Booking details
         public List<ChatMessage> GetChatMessages()
         {
-            List<ChatMessage> messages = new List<ChatMessage>();
+            var messages = new List<ChatMessage>();
 
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
-                string query = "SELECT * FROM ChatMessages";
+                const string query = @"
+                    SELECT cm.MessageId, cm.UserId, cm.Message, cm.Timestamp, 
+                           u.UserId, u.Name, u.Email,
+                           b.BookingId, b.UserId AS BookingUserId, b.RoomId, b.BookingDate
+                    FROM ChatMessages cm
+                    JOIN Users u ON cm.UserId = u.UserId
+                    LEFT JOIN Bookings b ON b.UserId = cm.UserId"; // Optional: Fetch related bookings
 
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                using (var cmd = new MySqlCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            // Null check for Message
-                            string message = reader["Message"]?.ToString() ?? throw new ArgumentNullException("Message cannot be null.");
+                        // Null check for Message and User details
+                        string message = reader["Message"]?.ToString() ?? throw new ArgumentNullException("Message cannot be null.");
+                        string userName = reader["Name"]?.ToString() ?? throw new ArgumentNullException("User Name cannot be null.");
+                        string userEmail = reader["Email"]?.ToString() ?? throw new ArgumentNullException("User Email cannot be null.");
 
-                            messages.Add(new ChatMessage(
-                                (int)reader["MessageId"],
-                                (int)reader["UserId"],
-                                message,
-                                (DateTime)reader["Timestamp"]
-                            ));
+                        var user = new User(
+                            (int)reader["UserId"],
+                            userName,
+                            userEmail
+                        );
+
+                        Booking? booking = null;
+                        if (reader["BookingId"] != DBNull.Value)
+                        {
+                            booking = new Booking(
+                                (int)reader["BookingId"],
+                                (int)reader["BookingUserId"],
+                                (int)reader["RoomId"],
+                                (DateTime)reader["BookingDate"]
+                            );
                         }
+
+                        messages.Add(new ChatMessage(
+                            (int)reader["MessageId"],
+                            (int)reader["UserId"],
+                            message,
+                            (DateTime)reader["Timestamp"],
+                            user,
+                            booking // Pass the optional Booking object
+                        ));
                     }
                 }
             }
@@ -132,32 +147,29 @@ namespace HotelChatbot
             return messages;
         }
 
-        // Method to fetch all hotel staff from the database
+        // Fetch all hotel staff from the database
         public List<HotelStaff> GetHotelStaff()
         {
-            List<HotelStaff> staffList = new List<HotelStaff>();
+            var staffList = new List<HotelStaff>();
 
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
-                string query = "SELECT * FROM HotelStaff";
+                const string query = "SELECT * FROM HotelStaff";
 
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                using (var cmd = new MySqlCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            // Null checks for Name and Role
-                            string name = reader["Name"]?.ToString() ?? throw new ArgumentNullException("Name cannot be null.");
-                            string role = reader["Role"]?.ToString() ?? throw new ArgumentNullException("Role cannot be null.");
+                        string name = reader["Name"]?.ToString() ?? throw new ArgumentNullException("Name cannot be null.");
+                        string role = reader["Role"]?.ToString() ?? throw new ArgumentNullException("Role cannot be null.");
 
-                            staffList.Add(new HotelStaff(
-                                (int)reader["StaffId"],
-                                name,
-                                role
-                            ));
-                        }
+                        staffList.Add(new HotelStaff(
+                            (int)reader["StaffId"],
+                            name,
+                            role
+                        ));
                     }
                 }
             }
