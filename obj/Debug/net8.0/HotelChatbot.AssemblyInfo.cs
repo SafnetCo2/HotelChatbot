@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HotelChatbot")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6e5dc1e0f733fd9e3d75a41ad56b2fc81d2af6e6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+187adad76eb3e923c9654198b524b118e1ee35b1")]
 [assembly: System.Reflection.AssemblyProductAttribute("HotelChatbot")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HotelChatbot")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

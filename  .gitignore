@@ -1,13 +1,30 @@
-# Ignore node_modules
-node_modules/
+# Ignore build output directories
+/bin/
+/obj/
 
-# Ignore .env files
-.env
+# Ignore user-specific files
+.vscode/
+.vs/
+*.user
+*.suo
 
-# Ignore build and dist directories
-/dist
-/build
+# Ignore local appsettings (keep production settings in the repo if needed)
+appsettings.Development.json
+appsettings.Production.json
+
+# Ignore package folders
+/packages/
+
+# Ignore log files
+*.log
 
 # Ignore system files
-.DS_Store
 Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Ignore user-specific IDE files
+.idea/
+
+# Git LFS specific
+*.lfs
