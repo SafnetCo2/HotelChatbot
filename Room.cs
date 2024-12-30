@@ -1,16 +1,11 @@
-public class Room
+// Room.cs
+namespace HotelChatbot
 {
-    public int RoomId { get; set; }
-    public string RoomType { get; set; } // Marked as required
-    public decimal Price { get; set; }
-    public bool IsAvailable { get; set; }
-
-    // Constructor with required properties
-    public Room(int roomId, string roomType, decimal price, bool isAvailable)
+    public class Room
     {
-        RoomId = roomId;
-        RoomType = roomType ?? throw new ArgumentNullException(nameof(roomType)); // Ensure non-null
-        Price = price;
-        IsAvailable = isAvailable;
+        public int RoomId { get; set; }
+        public string? RoomType { get; set; }
+        public decimal Price { get; set; }
+        public int Capacity { get; set; }  // Ensure this property is present
     }
 }

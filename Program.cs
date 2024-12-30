@@ -1,10 +1,7 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelChatbot
 {
@@ -12,33 +9,33 @@ namespace HotelChatbot
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var builder = CreateHostBuilder(args).Build();
+
+            using (var scope = builder.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var dbContext = services.GetRequiredService<HotelDbContext>();
+                dbContext.Database.Migrate(); // Apply migrations on startup
+            }
+
+            builder.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((context, config) =>
                 {
-                    // Set up configuration sources.
-                    config.SetBasePath(context.HostingEnvironment.ContentRootPath);
+                    // Adding appsettings.json configuration file
                     config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                 })
                 .ConfigureServices((context, services) =>
                 {
-                    // Configure EF Core with MySQL
-                    var connectionString = context.Configuration.GetConnectionString("DefaultConnection");
+                    // Configure the DbContext with MySQL connection string from configuration
                     services.AddDbContext<HotelDbContext>(options =>
                         options.UseMySql(
-                            connectionString,
-                            new MySqlServerVersion(new Version(8, 0, 26)) // Replace with your MySQL version
-                        )
-                    );
-
-                    // Add other application services
-                    services.AddSingleton<DatabaseContext>();
-
-                    // Optional: Add logging services for debug or info output
-                    services.AddLogging(config => config.AddConsole());
+                            context.Configuration.GetConnectionString("DefaultConnection"),
+                            ServerVersion.AutoDetect(context.Configuration.GetConnectionString("DefaultConnection"))
+                        ));
                 });
     }
 }

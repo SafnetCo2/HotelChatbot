@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/josphine/Desktop/HotelChatbot/HotelChatbot/HotelChatbot.csproj": {}
+    "/home/josphine/Desktop/C#/HotelChatbot/HotelChatbot.csproj": {}
   },
   "projects": {
-    "/home/josphine/Desktop/HotelChatbot/HotelChatbot/HotelChatbot.csproj": {
+    "/home/josphine/Desktop/C#/HotelChatbot/HotelChatbot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/josphine/Desktop/HotelChatbot/HotelChatbot/HotelChatbot.csproj",
+        "projectUniqueName": "/home/josphine/Desktop/C#/HotelChatbot/HotelChatbot.csproj",
         "projectName": "HotelChatbot",
-        "projectPath": "/home/josphine/Desktop/HotelChatbot/HotelChatbot/HotelChatbot.csproj",
+        "projectPath": "/home/josphine/Desktop/C#/HotelChatbot/HotelChatbot.csproj",
         "packagesPath": "/home/josphine/.nuget/packages/",
-        "outputPath": "/home/josphine/Desktop/HotelChatbot/HotelChatbot/obj/",
+        "outputPath": "/home/josphine/Desktop/C#/HotelChatbot/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/josphine/.nuget/NuGet/NuGet.Config"
@@ -46,6 +46,10 @@
             "Microsoft.AspNetCore.Mvc": {
               "target": "Package",
               "version": "[2.2.0, )"
+            },
+            "Microsoft.CodeAnalysis": {
+              "target": "Package",
+              "version": "[3.11.0, )"
             },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",

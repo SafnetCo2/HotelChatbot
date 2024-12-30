@@ -1,68 +1,67 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace HotelChatbot
 {
     public class HotelDbContext : DbContext
     {
-        private readonly string? _connectionString; // Make nullable
-
-        public HotelDbContext(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("DefaultConnection") ??
-                throw new ArgumentNullException("DefaultConnection", "Connection string cannot be null.");
-        }
-
+        // Constructor for DbContextOptions (required for EF migrations)
         public HotelDbContext(DbContextOptions<HotelDbContext> options)
             : base(options)
         {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            // You can remove this as the connection string should be handled in ConfigureServices
+            base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("Users");
+                entity.HasKey(e => e.UserId);
+                entity.Property(e => e.UserId).HasColumnName("UserId").IsRequired();
+                entity.Property(e => e.Name).HasColumnName("Name").IsRequired();
+                entity.Property(e => e.Email).HasColumnName("Email").IsRequired();
+            });
+
+            modelBuilder.Entity<Room>(entity =>
+            {
+                entity.ToTable("Rooms");
+                entity.HasKey(e => e.RoomId);
+                entity.Property(e => e.RoomId).HasColumnName("RoomId").IsRequired();
+                entity.Property(e => e.RoomType).HasColumnName("RoomType").IsRequired();
+                entity.Property(e => e.Price).HasColumnName("Price").IsRequired();
+                entity.Property(e => e.Capacity).HasColumnName("Capacity").IsRequired();
+            });
+
+            modelBuilder.Entity<Booking>(entity =>
+            {
+                entity.ToTable("Bookings");
+                entity.HasKey(e => e.BookingId);
+                entity.Property(e => e.BookingId).HasColumnName("BookingId").IsRequired();
+                entity.Property(e => e.UserId).HasColumnName("UserId").IsRequired();
+                entity.Property(e => e.RoomId).HasColumnName("RoomId").IsRequired();
+                entity.Property(e => e.BookingDate).HasColumnName("BookingDate").IsRequired();
+            });
+
+            modelBuilder.Entity<ChatMessage>(entity =>
+            {
+                entity.ToTable("ChatMessages");
+                entity.HasKey(e => e.MessageId);
+                entity.Property(e => e.MessageId).HasColumnName("MessageId").IsRequired();
+                entity.Property(e => e.Message).HasColumnName("Message").IsRequired();
+                entity.Property(e => e.Timestamp).HasColumnName("Timestamp").IsRequired();
+            });
         }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
-        public DbSet<HotelStaff> HotelStaff { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured && _connectionString != null)
-            {
-                optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
-            }
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-        }
-
-        public User? GetUserById(int userId) // Make nullable
-        {
-            return Users.FirstOrDefault(u => u.UserId == userId);
-        }
-
-        public Room? GetRoomById(int roomId) // Make nullable
-        {
-            return Rooms.FirstOrDefault(r => r.RoomId == roomId);
-        }
-
-        public Booking? GetBookingById(int bookingId) // Make nullable
-        {
-            return Bookings.FirstOrDefault(b => b.BookingId == bookingId);
-        }
-
-        public List<ChatMessage> GetChatMessagesByUserId(int userId)
-        {
-            return ChatMessages.Where(cm => cm.UserId == userId).ToList();
-        }
-
-        public HotelStaff? GetHotelStaffById(int staffId) // Make nullable
-        {
-            return HotelStaff.FirstOrDefault(h => h.StaffId == staffId);
-        }
     }
 }

@@ -1,16 +1,17 @@
-
-using System.ComponentModel.DataAnnotations;
-public class HotelStaff
+namespace HotelChatbot
 {
-    [Key]
-    public int StaffId { get; set; }
-    public string Name { get; set; } // Non-nullable
-    public string Role { get; set; } // Non-nullable
-
-    public HotelStaff(int staffId, string name, string role)
+    public class HotelStaff
     {
-        StaffId = staffId;
-        Name = name ?? throw new ArgumentNullException(nameof(name));
-        Role = role ?? throw new ArgumentNullException(nameof(role));
+        public int StaffId { get; set; }
+        public string Name { get; set; }
+        public string Role { get; set; }
+
+        // Constructor for HotelStaff
+        public HotelStaff(int staffId, string name, string role)
+        {
+            StaffId = staffId;
+            Name = name;
+            Role = role;
+        }
     }
 }

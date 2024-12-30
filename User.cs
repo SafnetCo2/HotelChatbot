@@ -3,15 +3,15 @@ namespace HotelChatbot
     public class User
     {
         public int UserId { get; set; }
-        public string? Name { get; set; }  // Nullable Name property
-        public string? Email { get; set; } // Nullable Email property
+        public string Name { get; set; }
+        public string Email { get; set; }
 
-        // Constructor with non-null validation
-        public User(int userId, string? name, string? email)
+        // Constructor for User
+        public User(int userId, string name, string email)
         {
             UserId = userId;
-            Name = name; // Can be null
-            Email = email; // Can be null
+            Name = name;
+            Email = email;
         }
     }
 }

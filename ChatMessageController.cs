@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using HotelChatbot;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace HotelChatbot.Controllers
 {
@@ -15,48 +15,67 @@ namespace HotelChatbot.Controllers
             _context = context;
         }
 
-        // GET: api/chatmessages
+        // GET: api/ChatMessages
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ChatMessage>>> GetChatMessages()
+        public async Task<ActionResult> GetChatMessages()
         {
-            return await _context.ChatMessages.Include(cm => cm.User).Include(cm => cm.Booking).ToListAsync();
-        }
+            var chatMessages = await _context.ChatMessages
+                .Include(cm => cm.User)  // Include User data
+                .Include(cm => cm.Booking)  // Include Booking data
+                .ToListAsync();
 
-        // GET: api/chatmessages/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ChatMessage>> GetChatMessage(int id)
-        {
-            var chatMessage = await _context.ChatMessages.FindAsync(id);
-
-            if (chatMessage == null)
+            if (chatMessages == null || chatMessages.Count == 0)
             {
-                return NotFound();
+                return NotFound("No chat messages found.");
             }
 
-            return chatMessage;
+            return Ok(chatMessages);
         }
 
-        // POST: api/chatmessages
+        // POST: api/ChatMessages
         [HttpPost]
-        public async Task<ActionResult<ChatMessage>> CreateChatMessage(ChatMessage chatMessage)
+        public async Task<ActionResult<ChatMessage>> PostChatMessage(ChatMessage chatMessage)
         {
+            if (chatMessage == null)
+            {
+                return BadRequest("Chat message cannot be null.");
+            }
+
+            if (string.IsNullOrEmpty(chatMessage.Message))
+            {
+                return BadRequest("Message cannot be empty.");
+            }
+
+            // Add the chat message to the context
             _context.ChatMessages.Add(chatMessage);
+
+            // Save changes to the database
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetChatMessage), new { id = chatMessage.ChatMessageId }, chatMessage);
+
+            // Return a 201 response with the location of the newly created resource
+            return CreatedAtAction(nameof(GetChatMessages), new { id = chatMessage.MessageId }, chatMessage);
         }
 
-        // DELETE: api/chatmessages/5
+        // DELETE: api/ChatMessages/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteChatMessage(int id)
         {
+            // Find the chat message by id
             var chatMessage = await _context.ChatMessages.FindAsync(id);
+
+            // If the chat message doesn't exist, return a 404 Not Found response
             if (chatMessage == null)
             {
                 return NotFound();
             }
 
+            // Remove the chat message from the database
             _context.ChatMessages.Remove(chatMessage);
+
+            // Save changes to the database
             await _context.SaveChangesAsync();
+
+            // Return a 204 No Content response indicating the message was deleted
             return NoContent();
         }
     }
