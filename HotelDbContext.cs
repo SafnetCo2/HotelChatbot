@@ -35,7 +35,10 @@ namespace HotelChatbot
                 entity.HasKey(e => e.RoomId);
                 entity.Property(e => e.RoomId).HasColumnName("RoomId").IsRequired();
                 entity.Property(e => e.RoomType).HasColumnName("RoomType").IsRequired();
-                entity.Property(e => e.Price).HasColumnName("Price").IsRequired();
+                entity.Property(e => e.Price)
+                    .HasColumnName("Price")
+                    .IsRequired()
+                    .HasColumnType("decimal(18,2)");  // Set price column type to decimal with 2 decimal places
                 entity.Property(e => e.Capacity).HasColumnName("Capacity").IsRequired();
             });
 

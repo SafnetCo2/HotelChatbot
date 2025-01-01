@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using HotelChatbot; // Ensure the namespace is correct
+using HotelChatbot;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<HotelDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 23)) // Adjust MySQL version if necessary
+        new MySqlServerVersion(new Version(8, 0, 23))
+    
     )
 );
 

@@ -19,10 +19,11 @@ namespace HotelChatbot.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Room>>> GetRooms()
         {
-            return await _context.Rooms.ToListAsync();
+            var rooms = await _context.Rooms.ToListAsync();
+            return Ok(rooms);  // Return 200 OK with a list of rooms
         }
 
-        // GET: api/rooms/5
+        // GET: api/rooms/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Room>> GetRoom(int id)
         {
@@ -30,10 +31,10 @@ namespace HotelChatbot.Controllers
 
             if (room == null)
             {
-                return NotFound();
+                return NotFound();  // Return 404 if room not found
             }
 
-            return room;
+            return Ok(room);  // Return 200 OK with the found room
         }
 
         // POST: api/rooms
@@ -42,35 +43,41 @@ namespace HotelChatbot.Controllers
         {
             _context.Rooms.Add(room);
             await _context.SaveChangesAsync();
+
+            // Return a 201 Created response with the created room
             return CreatedAtAction(nameof(GetRoom), new { id = room.RoomId }, room);
         }
 
-        // PUT: api/rooms/5
+        // PUT: api/rooms/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRoom(int id, Room room)
         {
             if (id != room.RoomId)
             {
-                return BadRequest();
+                return BadRequest();  // Return 400 if IDs don't match
             }
 
             _context.Entry(room).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+
+            // Return 204 No Content on success
             return NoContent();
         }
 
-        // DELETE: api/rooms/5
+        // DELETE: api/rooms/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRoom(int id)
         {
             var room = await _context.Rooms.FindAsync(id);
             if (room == null)
             {
-                return NotFound();
+                return NotFound();  // Return 404 if room not found
             }
 
             _context.Rooms.Remove(room);
             await _context.SaveChangesAsync();
+
+            // Return 204 No Content on success
             return NoContent();
         }
     }
