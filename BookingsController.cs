@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using HotelChatbot;
 
 namespace HotelChatbot.Controllers
@@ -39,10 +40,15 @@ namespace HotelChatbot.Controllers
         [HttpPost]
         public ActionResult<Booking> CreateBooking([FromBody] Booking booking)
         {
+            // Automatically set the BookingDate to current UTC time if not provided
+            booking.BookingDate = DateTime.UtcNow;
+
             _context.Bookings.Add(booking);
             _context.SaveChanges();
+
             return CreatedAtAction(nameof(GetBooking), new { id = booking.BookingId }, booking);
         }
+
 
         // PUT api/bookings/{id}
         [HttpPut("{id}")]
