@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: hotel-chatbot
+    env: asp.net
+    buildCommand: "dotnet build"
+    startCommand: "dotnet HotelChatbot.dll"
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        value: "<your-mysql-database-url>"
+    plan: free
+    regions:
+      - oregon

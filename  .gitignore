@@ -7,7 +7,7 @@
 .vs/
 *.user
 *.suo
-
+.yaml
 # Ignore local appsettings (keep production settings in the repo if needed)
 appsettings.Development.json
 appsettings.Production.json
