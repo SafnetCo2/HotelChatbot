@@ -1,3 +1,7 @@
+using Newtonsoft.Json;
+using HotelChatbot.Converters;
+
+
 public class Booking
 {
     public int BookingId { get; set; }

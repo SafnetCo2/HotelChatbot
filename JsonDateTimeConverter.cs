@@ -1,16 +1,14 @@
 using Newtonsoft.Json;
-
 using System;
 
 namespace HotelChatbot.Converters
 {
     public class JsonDateTimeConverter : JsonConverter
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             if (value is DateTime dateTime)
             {
-                // Write the DateTime as a string in the format "yyyy-MM-ddTHH:mm:ss"
                 writer.WriteValue(dateTime.ToString("yyyy-MM-ddTHH:mm:ss"));
             }
             else
@@ -19,11 +17,11 @@ namespace HotelChatbot.Converters
             }
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Date)
             {
-                return (DateTime)reader.Value;
+                return reader.Value is DateTime dateTime ? dateTime : DateTime.MinValue;
             }
 
             return DateTime.MinValue;
