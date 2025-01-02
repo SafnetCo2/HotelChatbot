@@ -9,7 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<HotelDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 23)));
+
+    // Configure MySQL with retry on failure (useful for transient connection issues)
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 23)),
+        mysqlOptions => mysqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null)
+    );
 });
 
 // Add controllers (API endpoints)
