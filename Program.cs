@@ -40,5 +40,8 @@ app.UseAuthorization(); // Authorization middleware
 app.MapControllers();
 
 // Render binds to the PORT environment variable, so let's use that for the port:
+// Render uses the PORT environment variable to bind your app to the correct port
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000"; // Default to 5000 if PORT is not set
-app.Run($"http://0.0.0.0:{port}"); 
+
+// Run the application on the specified port
+app.Run($"http://0.0.0.0:{port}");
