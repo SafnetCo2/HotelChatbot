@@ -2,6 +2,8 @@
 using HotelChatbot;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.Rewrite;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,17 @@ builder.Services.AddDbContext<HotelDbContext>(options =>
     );
 });
 
+// Enable CORS to allow requests from the frontend URL or other APIs
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()  // Allow any origin for cross-origin requests
+              .AllowAnyMethod()  // Allow any HTTP method (GET, POST, etc.)
+              .AllowAnyHeader(); // Allow any headers in the request
+    });
+});
+
 // Add controllers (API endpoints)
 builder.Services.AddControllers();
 
@@ -37,6 +50,9 @@ builder.Services.AddSwaggerGen(); // Enables Swagger for API documentation
 
 // Build the application
 var app = builder.Build();
+
+// Enable CORS for all endpoints
+app.UseCors("AllowAll");
 
 // Enable Swagger UI in the development environment
 if (app.Environment.IsDevelopment())
@@ -60,3 +76,6 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "5000"; // Default to 5
 
 // Run the application on the specified port
 app.Run($"http://0.0.0.0:{port}");
+
+// For Render, you can also explicitly define the allowed base URL if needed for routing.
+app.UseRewriter(new RewriteOptions().AddRedirect("^$", "https://hotelchatbot-1mv0.onrender.com"));
