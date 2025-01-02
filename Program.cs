@@ -10,7 +10,6 @@ builder.Services.AddDbContext<HotelDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 23))
-    
     )
 );
 
@@ -40,5 +39,7 @@ app.UseAuthorization(); // Authorization middleware
 // Map controllers to automatically pick up routes from your controller files
 app.MapControllers();
 
-// Run the application
-app.Run();
+// Render binds to the PORT environment variable, so let's use that for the port:
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000"; // Default to 5000 if PORT is not set
+app.Run($"http://0.0.0.0:{port}"); // Binds to 0.0.0.0 to allow external connections
+
