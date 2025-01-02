@@ -54,10 +54,24 @@ namespace HotelChatbot
                 entity.Property(e => e.RoomId).HasColumnName("RoomId").IsRequired();
 
                 // Set BookingDate with default value (current timestamp)
+                // entity.Property(e => e.BookingDate)
+                // .HasColumnName("BookingDate")
+                // .HasColumnType("TIMESTAMP") // Explicitly set the column type
+                // .IsRequired()
+                // .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                // Automatically generate current timestamp for BookingDate if not provided
                 entity.Property(e => e.BookingDate)
-                    .HasColumnName("BookingDate")
-                    .IsRequired()
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP"); // Automatically use the current timestamp if not set
+                      .HasColumnName("BookingDate")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                      .ValueGeneratedOnAdd();
+
+
+
+
+
+
+                // Automatically use the current timestamp if not set
             });
 
             // Configuration for the ChatMessage entity

@@ -3,7 +3,6 @@ using System;
 using HotelChatbot;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -17,23 +16,21 @@ namespace HotelChatbot.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("HotelChatbot.Booking", b =>
+            modelBuilder.Entity("Booking", b =>
                 {
                     b.Property<int>("BookingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("BookingId");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BookingId"));
-
                     b.Property<DateTime>("BookingDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("BookingDate");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TIMESTAMP")
+                        .HasColumnName("BookingDate")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int>("RoomId")
                         .HasColumnType("int")
@@ -54,8 +51,6 @@ namespace HotelChatbot.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("MessageId");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("MessageId"));
 
                     b.Property<int?>("BookingId")
                         .HasColumnType("int");
@@ -88,14 +83,12 @@ namespace HotelChatbot.Migrations
                         .HasColumnType("int")
                         .HasColumnName("RoomId");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RoomId"));
-
                     b.Property<int>("Capacity")
                         .HasColumnType("int")
                         .HasColumnName("Capacity");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("Price");
 
                     b.Property<string>("RoomType")
@@ -115,8 +108,6 @@ namespace HotelChatbot.Migrations
                         .HasColumnType("int")
                         .HasColumnName("UserId");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserId"));
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext")
@@ -134,7 +125,7 @@ namespace HotelChatbot.Migrations
 
             modelBuilder.Entity("HotelChatbot.ChatMessage", b =>
                 {
-                    b.HasOne("HotelChatbot.Booking", "Booking")
+                    b.HasOne("Booking", "Booking")
                         .WithMany()
                         .HasForeignKey("BookingId");
 
