@@ -10,6 +10,18 @@ builder.Services.AddDbContext<HotelDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+    // Check if the environment is development (local)
+    if (builder.Environment.IsDevelopment())
+    {
+        // Use localhost settings for local development
+        connectionString = "Server=localhost;Port=3306;Database=HotelDb;User=root;Password=Root@1234;";
+    }
+    else
+    {
+        // Use Render's MySQL connection settings in production
+        connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    }
+
     // Configure MySQL with retry on failure (useful for transient connection issues)
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 23)),
         mysqlOptions => mysqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null)
