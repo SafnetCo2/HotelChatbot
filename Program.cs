@@ -1,17 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using HotelChatbot;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddDbContext<HotelDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 23))
-    )
-);
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 23)));
+});
 
 // Add controllers (API endpoints)
 builder.Services.AddControllers();
