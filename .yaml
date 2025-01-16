@@ -1,14 +1,25 @@
+version: '3.8'
+
 services:
-  - type: web
-    name: hotel-chatbot
-    env: asp.net
-    buildCommand: "dotnet build"
-    startCommand: "dotnet HotelChatbot.dll"
-    envVars:
-      - key: ASPNETCORE_ENVIRONMENT
-        value: Production
-      - key: DATABASE_URL
-        value: "<your-mysql-database-url>"
-    plan: free
-    regions:
-      - oregon
+  hotelchatbot:
+    build: .
+    ports:
+      - "5000:80"  # Exposes the app on port 5000
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DefaultConnection=Server=db;Port=3306;Database=HotelDb;User=root;Password=Root@1234;  # Adjust your connection string here
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: Root@1234
+      MYSQL_DATABASE: HotelDb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
